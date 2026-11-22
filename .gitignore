@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# 构建产物
+build/
+dist/
+*.app/
+*.dmg
+*.zip
+
+# Xcode / Swift
+xcuserdata/
+*.xcuserstate
+.swiftpm/
+Package.resolved
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
