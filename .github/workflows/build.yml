@@ -1,0 +1,50 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  macos:
+    name: Build universal app
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          sw_vers
+          swiftc --version
+
+      - name: Build & package
+        run: |
+          chmod +x build.sh
+          ./build.sh --package
+
+      - name: Verify architectures
+        run: |
+          lipo -archs ProxyPulse.app/Contents/MacOS/ProxyPulse
+          codesign --verify --verbose=2 ProxyPulse.app
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ProxyPulse-universal
+          path: |
+            dist/ProxyPulse.dmg
+            dist/ProxyPulse.zip
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/ProxyPulse.dmg
+            dist/ProxyPulse.zip
+          generate_release_notes: true
